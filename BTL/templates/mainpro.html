@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mạng Cảm Biến</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+
+    <script>
+
+        function saveCheckboxState(id) {
+            const checkbox = document.getElementById(id);
+            localStorage.setItem(id, checkbox.checked);
+        }
+
+        // Hàm tải lại trạng thái của checkbox từ localStorage
+        function loadCheckboxState(id) {
+            const savedState = localStorage.getItem(id);
+            if (savedState !== null) {
+                document.getElementById(id).checked = (savedState === 'true');
+            }
+        }
+
+
+        function updateData() {
+        fetch('/get_data')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('#temperature').innerHTML = data.temperature + '°C';
+                document.querySelector('#humidity').innerHTML = data.humidity + '%';
+                document.querySelector('#light').innerHTML = data.light + ' Lux';
+                document.querySelector('#date').innerHTML = data.date;
+
+                if (data.temperature > 35) {
+                    document.getElementById("c").checked = true;
+                    controlDevice('led3', true);  // Gọi hàm bật warning LED
+                } else {
+                    document.getElementById("c").checked = false;
+                    controlDevice('led3', false);  // Gọi hàm tắt warning LED
+                }
+                
+            });
+    }
+        updateData();
+        // Cập nhật dữ liệu mỗi 5 giây
+        setInterval(updateData, 5000);
+
+
+        // Load lại trạng thái của các checkbox khi tải trang
+        window.onload = function() {
+            loadCheckboxState("a");
+            loadCheckboxState("b");
+            // loadCheckboxState("c");
+        }
+
+        function controlDevice(device, state) {
+                    const action = state ? 'on' : 'off';
+                    
+                    fetch('/control-device', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ device: device, action: action }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.message);  // Xử lý phản hồi từ server nếu cần
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+    </script>
+    
+
+    <div class="dashboard">
+        <header>
+            <div class="f fe">
+                <div class="heading">
+                    <h5 class="date">Date</h5>
+                    <h2 class="title"><span id="date">{{ date }}</span></h2>
+                    <!-- <p>{{ date }}</p> -->
+                </div>
+            </div>
+            <div class="weather f">
+                <div>
+                    <strong><span id="temperature">{{ sensor_data.temperature }}°C</span></strong>
+                    <p>Indoor Temperature</p>
+                </div>
+                <div>
+                    <strong><span id="humidity">{{ sensor_data.humidity }}%</span></strong>
+                    <p>Outdoor Humidity</p>
+                </div>
+                <div>
+                    <strong><span id="light">{{ sensor_data.light }} Lux</span></strong>
+                    <p>Brightness</p>
+                </div>
+                
+            </div>
+        </header>
+        <section>
+            <div class="category">
+                <ul>
+                  <li><a class="active">Control</a></li>
+                  <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
+                  <li><a href="{{ url_for('index_info') }}">History</a></li>
+                  <li><a href="{{ url_for('index_data') }}">Data</a></li>
+                </ul>
+            </div>
+            <div class="appliances">            
+                <div class="appliance">
+                  <input type="checkbox" name="a" id="a" onchange="controlDevice('led1', this.checked); saveCheckboxState('a');">
+                  <label for="a">
+                    <i class="l"></i>
+                    <img width="30px" src="{{ url_for('static', filename='assets/lightbulb.png') }}" alt="Example Image">
+
+                    <!-- <img width="30px"src='assets/lightbulb.png'> -->
+                    <strong>
+                        Lamp
+                    </strong>
+                    <span data-o="opened" data-c="closed"></span>
+                    
+                  </label>
+                </div>
+                
+                <div class="appliance">
+                  <input type="checkbox" name="a" id="b" onchange="controlDevice('led2', this.checked); saveCheckboxState('b');">
+                  <label for="b">
+                    <i class="q"></i>
+                    <img width="30px" src="{{ url_for('static', filename='assets/fan.png') }}" alt="Example Image">
+                    <!-- <img width="30px"src='assets/fan.png'> -->
+                    <strong>Fan</strong>
+                    <span data-o="opened" data-c="closed"></span>
+                    
+                  </label>
+                </div>
+                
+                <!-- <div class="appliance">
+                    <input type="checkbox" name="a" id="c"  onchange="controlDevice('led3', this.checked); saveCheckboxState('c');">
+                    <label for="c">
+                      <i class="r"></i>
+                      <img width="30px" src="{{ url_for('static', filename='assets/lightbulb.png') }}" alt="Example Image">
+                      <strong>Warning</strong>
+                      <span data-o="opened" data-c="closed"></span>
+                      
+                    </label>
+                  </div> -->
+
+            </div>
+        </section>
+    </div>
+</body>
+</html>

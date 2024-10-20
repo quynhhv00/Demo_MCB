@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mạng Cảm Biến</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+
+    <script>
+        function updateData() {
+            fetch('/get_data3')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.getElementById('data-table-body');
+                    tableBody.innerHTML = '';  // Xóa nội dung cũ
+                    data.forEach(item => {
+                        let row = `<tr>
+                            <td>${item[0]}</td>
+                            <td>${item[1]}</td>
+                            <td>${item[2]}</td>
+                            <td>${item[3]}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                });
+        }
+        updateData();
+        setInterval(updateData, 5000);  // Cập nhật mỗi 5 giây
+    </script>
+    
+
+    <div class="dashboard">
+        <section>
+            <div class="category">
+                <ul>
+                    <li><a href="{{ url_for( 'index') }}" >Control</a></li>
+                    <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
+                    <li><a class="active">History</a></li>
+                    <li><a href="{{ url_for('index_data') }}">Data</a></li>
+                </ul>
+            </div>
+            <div class="infos">
+                <table border="2">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Device</th>
+                            <th>Action</th>
+                            <th>Time_stamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body">
+                        <!-- Dữ liệu sẽ được AJAX thêm vào đây -->
+                        {% for entry in data %}
+                        <tr>
+                            <td>{{ entry[0] }}</td>
+                            <td>{{ entry[1] }}</td>
+                            <td>{{ entry[2] }}</td>
+                            <td>{{ entry[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
