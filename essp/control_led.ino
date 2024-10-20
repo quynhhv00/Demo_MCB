@@ -17,7 +17,6 @@ DHT dht(DPIN, DTYPE);
 
 #define D5 14
 #define D6 12
-#define D7 13
 
 
 // Update these with values suitable for your network.
@@ -78,18 +77,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     digitalWrite(D6, LOW);   // Tắt LED2
   } else if (message == "led2_on") {
     digitalWrite(D6, HIGH);  // Bật LED2
-  } else if (message == "led3_off") {
-    digitalWrite(D7, LOW);   // Tắt LED3
-  } else if (message == "led3_on") {
-    digitalWrite(D7, HIGH);  // Bật LED3
   } else if (message == "led_off") {
     digitalWrite(D5, LOW);
-    digitalWrite(D6, LOW);
-    digitalWrite(D7, LOW);   // Tắt tất cả các LED
+    digitalWrite(D6, LOW);// Tắt tất cả các LED
   } else if (message == "led_on") {
     digitalWrite(D5, HIGH);
-    digitalWrite(D6, HIGH);
-    digitalWrite(D7, HIGH);  // Bật tất cả các LED
+    digitalWrite(D6, HIGH);// Bật tất cả các LED
   }
 
 
@@ -104,9 +97,6 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str(),"jul","123")) {
       Serial.println("connected");
-      // Once connected, publish an announcement...
-      // client.publish("Connected");
-      // // ... and resubscribe
       client.subscribe("control");
 
     } else {
@@ -123,7 +113,6 @@ void setup() {
   pinMode(BUILTIN_LED, OUTPUT);  // Khoi tao chan LED
   pinMode(D5, OUTPUT); //led1
   pinMode(D6, OUTPUT); //led2
-  pinMode(D7, OUTPUT); //led3  
   pinMode(DIGITAL_INPUT_PIN, INPUT);  // digital
   
   dht.begin();
