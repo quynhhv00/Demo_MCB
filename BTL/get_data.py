@@ -67,13 +67,11 @@ def index():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT  temperature, humidity, light, DATE_FORMAT(Tgian, '%Y-%m-%d %H:%i:%s') AS formatted_date FROM datass ORDER BY Tgian DESC LIMIT 1")
-    sensor_data = cursor.fetchone()
-    
+    sensor_data = cursor.fetchone()   
     # Đóng kết nối
     cursor.close()
     conn.close()
-    return render_template('mainpro.html', sensor_data=sensor_data, date=formatted_date)
-
+    return render_template('mainpro.html', sensor_data=sensor_data)
 #Lấy dữ liệu vào data
 @app.route('/get_data2')
 def get_data2():
@@ -111,8 +109,7 @@ def index_chart():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT  temperature, humidity, light, DATE_FORMAT(Tgian, '%Y-%m-%d %H:%i:%s') AS formatted_date FROM datass ORDER BY Tgian DESC LIMIT 1")
-    sensor_data = cursor.fetchone()
-    
+    sensor_data = cursor.fetchone()    
     cursor.close()
     conn.close()
     return render_template('chart.html', sensor_data=sensor_data)
