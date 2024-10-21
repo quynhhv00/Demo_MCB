@@ -66,26 +66,12 @@ def get_data():
 def index():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    # Lấy dữ liệu cảm biến
-    cursor.execute('SELECT temperature, humidity, light, Tgian FROM datass ORDER BY Tgian DESC LIMIT 1')
+    cursor.execute("SELECT  temperature, humidity, light, DATE_FORMAT(Tgian, '%Y-%m-%d %H:%i:%s') AS formatted_date FROM datass ORDER BY Tgian DESC LIMIT 1")
     sensor_data = cursor.fetchone()
     
     # Đóng kết nối
     cursor.close()
     conn.close()
-    
-    # Chuyển đổi timestamp thành định dạng ngày tháng năm
-    if sensor_data and sensor_data['Tgian']:
-        if isinstance(sensor_data['Tgian'], datetime):
-            timestamp = int(sensor_data['Tgian'].timestamp())
-        else:
-            timestamp = int(sensor_data['Tgian'])
-
-        formatted_date = datetime.fromtimestamp(timestamp).strftime("%d/%m/%Y")
-    else:
-        formatted_date = "Không có dữ liệu"
-
     return render_template('mainpro.html', sensor_data=sensor_data, date=formatted_date)
 
 #Lấy dữ liệu vào data
@@ -124,24 +110,12 @@ def get_data1():
 def index_chart():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
-    cursor.execute('SELECT temperature, humidity, light, Tgian FROM datass ORDER BY Tgian DESC LIMIT 1')
+    cursor.execute("SELECT  temperature, humidity, light, DATE_FORMAT(Tgian, '%Y-%m-%d %H:%i:%s') AS formatted_date FROM datass ORDER BY Tgian DESC LIMIT 1")
     sensor_data = cursor.fetchone()
     
     cursor.close()
     conn.close()
-    
-    if sensor_data and sensor_data['Tgian']:
-        if isinstance(sensor_data['Tgian'], datetime):
-            timestamp = int(sensor_data['Tgian'].timestamp())
-        else:
-            timestamp = int(sensor_data['Tgian'])
-
-        formatted_date = datetime.fromtimestamp(timestamp).strftime("%d/%m/%Y")
-    else:
-        formatted_date = "Không có dữ liệu"
-
-    return render_template('chart.html', sensor_data=sensor_data, date=formatted_date)
+    return render_template('chart.html', sensor_data=sensor_data)
 
 @app.route('/get_data3')
 def get_data3():
