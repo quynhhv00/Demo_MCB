@@ -35,12 +35,14 @@
                 document.querySelector('#date').innerHTML = data.date;
 
                 if (data.temperature > 35) {
-                    document.getElementById("c").checked = true;
-                    controlDevice('led3', true);  // Gọi hàm bật warning LED
-                } else {
-                    document.getElementById("c").checked = false;
-                    controlDevice('led3', false);  // Gọi hàm tắt warning LED
-                }
+                document.getElementById("c").checked = true;
+                controlDevice('ledw', true);  // Gọi hàm bật warning LED
+                saveCheckboxState('c');  // Lưu trạng thái checkbox sau khi bật LED
+            } else {
+                document.getElementById("c").checked = false;
+                controlDevice('ledw', false);  // Gọi hàm tắt warning LED
+                saveCheckboxState('c');  // Lưu trạng thái checkbox sau khi tắt LED
+            }
                 
             });
     }
@@ -53,7 +55,7 @@
         window.onload = function() {
             loadCheckboxState("a");
             loadCheckboxState("b");
-            // loadCheckboxState("c");
+            loadCheckboxState("c");
         }
 
         function controlDevice(device, state) {
@@ -79,6 +81,14 @@
 
     <div class="dashboard">
         <header>
+            <div class="category">
+                <ul>
+                  <li><a class="active">Control</a></li>
+                  <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
+                  <li><a href="{{ url_for('index_info') }}">History</a></li>
+                  <li><a href="{{ url_for('index_data') }}">Data</a></li>
+                </ul>
+            </div>
             <div class="f fe">
                 <div class="heading">
                     <h5 class="date">Date</h5>
@@ -103,25 +113,13 @@
             </div>
         </header>
         <section>
-            <div class="category">
-                <ul>
-                  <li><a class="active">Control</a></li>
-                  <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
-                  <li><a href="{{ url_for('index_info') }}">History</a></li>
-                  <li><a href="{{ url_for('index_data') }}">Data</a></li>
-                </ul>
-            </div>
             <div class="appliances">            
                 <div class="appliance">
                   <input type="checkbox" name="a" id="a" onchange="controlDevice('led1', this.checked); saveCheckboxState('a');">
                   <label for="a">
                     <i class="l"></i>
-                    <img width="30px" src="{{ url_for('static', filename='assets/lightbulb.png') }}" alt="Example Image">
-
-                    <!-- <img width="30px"src='assets/lightbulb.png'> -->
-                    <strong>
-                        Lamp
-                    </strong>
+                    <img width="36px" src="{{ url_for('static', filename='assets/lightbulb.png') }}" alt="Example Image">
+                    <strong>Lamp</strong>
                     <span data-o="opened" data-c="closed"></span>
                     
                   </label>
@@ -131,24 +129,24 @@
                   <input type="checkbox" name="a" id="b" onchange="controlDevice('led2', this.checked); saveCheckboxState('b');">
                   <label for="b">
                     <i class="q"></i>
-                    <img width="30px" src="{{ url_for('static', filename='assets/fan.png') }}" alt="Example Image">
-                    <!-- <img width="30px"src='assets/fan.png'> -->
+                    <img width="36px" src="{{ url_for('static', filename='assets/fan.png') }}" alt="Example Image">
                     <strong>Fan</strong>
                     <span data-o="opened" data-c="closed"></span>
                     
                   </label>
                 </div>
                 
-                <!-- <div class="appliance">
-                    <input type="checkbox" name="a" id="c"  onchange="controlDevice('led3', this.checked); saveCheckboxState('c');">
+                <div class="appliance">
+                    <input type="checkbox" name="a" id="c" onchange="controlDevice('ledw', this.checked); saveCheckboxState('c');">
                     <label for="c">
                       <i class="r"></i>
-                      <img width="30px" src="{{ url_for('static', filename='assets/lightbulb.png') }}" alt="Example Image">
+                      <img width="36px" src="{{ url_for('static', filename='assets/warning.png') }}" alt="Example Image">
                       <strong>Warning</strong>
                       <span data-o="opened" data-c="closed"></span>
                       
                     </label>
-                  </div> -->
+                  </div>
+
 
             </div>
         </section>
