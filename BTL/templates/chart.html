@@ -31,6 +31,14 @@
 
     <div class="dashboard">
         <header>
+            <div class="category">
+                <ul>
+                  <li><a href="{{ url_for('index') }}" >Control</a></li>
+                  <li><a class="active">Chart</a></li>
+                  <li><a href="{{ url_for('index_info') }}">History</a></li>
+                  <li><a href="{{ url_for('index_data') }}">Data</a></li>
+                </ul>
+            </div>
             <div class="f fe">
                 <div class="heading">
                     <h5 class="date">Date</h5>
@@ -54,14 +62,6 @@
             </div>
         </header>
         <section>
-            <div class="category">
-                <ul>
-                  <li><a href="{{ url_for('index') }}" >Control</a></li>
-                  <li><a class="active">Chart</a></li>
-                  <li><a href="{{ url_for('index_info') }}">History</a></li>
-                  <li><a href="{{ url_for('index_data') }}">Data</a></li>
-                </ul>
-            </div>
             <div class="charts">
                 <canvas id="myChart" style="width:100%;max-width:400px"></canvas>
                 <script src="{{ url_for('static', filename='chart.js') }}"></script>
