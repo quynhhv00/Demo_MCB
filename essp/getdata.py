@@ -13,13 +13,13 @@ db = mysql.connector.connect(
 cursor = db.cursor()
 
 # Hàm lưu dữ liệu vào bảng 'datass'
-def save_data_to_datass(temperature, humidity, light):
+def save_data_to_datass(temperature, humidity, light, AQI):
     try:
-        sql = "INSERT INTO datass (temperature, humidity, light) VALUES (%s, %s, %s)"
-        values = (temperature, humidity, light)
+        sql = "INSERT INTO datass (temperature, humidity, AQI, light) VALUES (%s, %s, %s, %s)"
+        values = (temperature, humidity, AQI, light)
         cursor.execute(sql, values)
         db.commit()
-        print(f"Data saved to datass: Temp={temperature}, Hum={humidity}, Light={light}")
+        print(f"Data saved to datass: Temp={temperature}, Hum={humidity}, Light={light}, AQI={AQI}")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
 
@@ -72,10 +72,12 @@ def on_message(client, userdata, msg):
                 elif key == 'Humility':
                     humidity = float(value.replace('%', '').strip())  
                 elif key == 'Light':
-                    light = int(value.replace(' Lux', '').strip())  
+                    light = int(value.replace(' Lux', '').strip())
+                elif key == 'AQI':
+                    AQI = int(value.replace('', '').strip())      
 
             # Lưu dữ liệu vào bảng 'datass'
-            save_data_to_datass(temperature, humidity, light)
+            save_data_to_datass(temperature, humidity, light, AQI)
 
         except Exception as e:
             print(f"Error processing data message: {e}")
@@ -83,17 +85,17 @@ def on_message(client, userdata, msg):
     elif topic == "control":
         # Kiểm tra trạng thái LED nhận được và lưu vào bảng 'devices'
         if payload == "led1_on":
-            save_data_to_devices("led1", "on")
+            save_data_to_devices("Lamp", "on")
         elif payload == "led1_off":
-            save_data_to_devices("led1", "off")
+            save_data_to_devices("Lamp", "off")
         elif payload == "led2_on":
-            save_data_to_devices("led2", "on")
+            save_data_to_devices("Fan", "on")
         elif payload == "led2_off":
-            save_data_to_devices("led2", "off")
-        elif payload == "led3_on":
-           save_data_to_devices("led3", "on")
-        elif payload == "led3_off":
-            save_data_to_devices("led3", "off")
+            save_data_to_devices("Fan", "off")
+        elif payload == "ledw_off":
+            save_data_to_devices("WARNING", "off")
+        elif payload == "ledw_on":
+            save_data_to_devices("WARNING", "on")
         elif payload == "led_on":
             save_data(1)
         elif payload == "led_off":
