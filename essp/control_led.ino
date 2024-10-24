@@ -14,9 +14,11 @@ DHT dht(DPIN, DTYPE);
 #define ANALOG_INPUT_PIN A0  // Chan analog (A0 tren ESP8266)
 #define DIGITAL_INPUT_PIN 5  // Chan digital (D1 tren ESP8266 tuong ung voi GPIO5)
 
+#define LEDW D8
 
 #define D5 14
 #define D6 12
+#define D7 13
 
 
 // Update these with values suitable for your network.
@@ -77,12 +79,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
     digitalWrite(D6, LOW);   // Tắt LED2
   } else if (message == "led2_on") {
     digitalWrite(D6, HIGH);  // Bật LED2
+  } else if (message == "led3_off") {
+    digitalWrite(D7, LOW);   // Tắt LED3
+  } else if (message == "led3_on") {
+    digitalWrite(D7, HIGH);  // Bật LED3
   } else if (message == "led_off") {
     digitalWrite(D5, LOW);
-    digitalWrite(D6, LOW);// Tắt tất cả các LED
+    digitalWrite(D6, LOW);
+    digitalWrite(D7, LOW);   // Tắt tất cả các LED
   } else if (message == "led_on") {
     digitalWrite(D5, HIGH);
-    digitalWrite(D6, HIGH);// Bật tất cả các LED
+    digitalWrite(D6, HIGH);
+    digitalWrite(D7, HIGH);  // Bật tất cả các LED
   }
 
 
@@ -113,6 +121,8 @@ void setup() {
   pinMode(BUILTIN_LED, OUTPUT);  // Khoi tao chan LED
   pinMode(D5, OUTPUT); //led1
   pinMode(D6, OUTPUT); //led2
+  pinMode(D7, OUTPUT); //led3 
+  pinMode(LEDW, OUTPUT); //ledwarning
   pinMode(DIGITAL_INPUT_PIN, INPUT);  // digital
   
   dht.begin();
@@ -141,18 +151,29 @@ void loop() {
     // Doc gia tri tu cac chan     analog va digital
     int analogValue = analogRead(ANALOG_INPUT_PIN); // Doc gia tri tu chan A0 (cam bien anh sang)
     int digitalValue = digitalRead(DIGITAL_INPUT_PIN); // Doc gia tri tu GPIO5 (chan digital)
+    int aqivalue = random (25,100);
 
     // Kiem tra loi doc cam bien DHT
     if (isnan(temp) || isnan(humi)) {
       Serial.println("Failed to read from DHT sensor!");
     }else{
         //temperature  //humidity
-     snprintf(msg, MSG_BUFFER_SIZE, "Temperature: %.2f C, Humility: %.0f%%, Light: %d Lux", temp, humi, analogValue);
+     snprintf(msg, MSG_BUFFER_SIZE, "Temperature: %.2f C, Humility: %.0f%%, Light: %d Lux, AQI: %d", temp, humi, analogValue, aqivalue);
     }
 
     Serial.print("Publish message: ");
     Serial.println(msg);
     client.publish("data", msg);
+    if (temp > 35) {
+            for (int i=0;i<10;i++) {  
+            digitalWrite(LEDW, HIGH);
+            delay(250);  
+            digitalWrite(LEDW, LOW);
+            delay(250); 
+        }
+          } else {
+            digitalWrite(LEDW, LOW); // LED tắt khi nhiệt độ <= 35
+            }
     delay(50);
   }
 }
