@@ -5,11 +5,11 @@
 * **Description**: Gửi lệnh điều khiển đến thiết bị thông qua MQTT.  
   * **Input (JSON):**
 
-  {
+{
 
-  	"device": "device\_name",
+   "device": "device\_name",
 
- 	"action": "on/off"
+   "action": "on/off"
 
 }
 
@@ -48,7 +48,7 @@
 
  	 "date": "dd/mm/yyyy"
 
-}
+	}
 
 #### **3\. Get Data for Chart**
 
@@ -88,7 +88,7 @@
 
  	 "current\_page": 1
 
-}
+	}
 
 #### **5\. Get Sensor Data with Pagination**
 
@@ -113,7 +113,7 @@
 
  	 "current\_page": 1
 
-}
+	}
 
 #### **6\. Control LED**
 
