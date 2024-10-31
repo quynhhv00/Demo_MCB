@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mạng Cảm Biến</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <script>
+        let prevAQI; // Lưu lại giá trị AQI cũ để so sánh
+    
+        function saveCheckboxState(id) {
+            const checkbox = document.getElementById(id);
+            localStorage.setItem(id, checkbox.checked);
+        }
+    
+        function loadCheckboxState(id) {
+            const savedState = localStorage.getItem(id);
+            if (savedState !== null) {
+                document.getElementById(id).checked = (savedState === 'true');
+            }
+        }
+    
+        function updateData() {
+            fetch('/get_datadb')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.AQI) return; // Đảm bảo AQI có giá trị
+    
+                    document.querySelector('#AQI').innerHTML = data.AQI;
+                    const AQIThreshold = 70;
+    
+                    if (data.AQI > AQIThreshold && (!prevAQI || prevAQI <= AQIThreshold)) {
+                        document.getElementById("c").checked = true;
+                        controlDevice('ledw', true);
+                        saveCheckboxState('c');
+                    } else if (data.AQI <= AQIThreshold && prevAQI > AQIThreshold) {
+                        document.getElementById("c").checked = false;
+                        controlDevice('ledw', false);
+                        saveCheckboxState('c');
+                    }
+    
+                    prevAQI = data.AQI; // Cập nhật AQI cũ
+                })
+                .catch(error => console.error('Error fetching AQI:', error));
+        }
+    
+        function controlDevice(device, state) {
+            const action = state ? 'on' : 'off';
+            fetch('/control-device', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ device: device, action: action }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    
+        window.onload = function() {
+            loadCheckboxState("c");
+            updateData();
+        }
+    
+        setInterval(updateData, 5000);
+    </script>
+    <div class="dashboard">
+        
+        <header>
+            <div class="category">
+                <ul>
+                  <li><a href="{{ url_for('index') }}">Control</a></li>
+                  <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
+                  <li><a href="{{ url_for('index_info') }}">History</a></li>
+                  <li><a href="{{ url_for('index_data') }}">Data</a></li>
+                  <li><a class="active">Bụi</a></li>
+                </ul>
+            </div>
+            <div class="dobuis">            
+                <div class="appliance">
+                    <input type="checkbox" name="a" id="c" onchange="controlDevice('ledw', this.checked); saveCheckboxState('c');">
+                    <label for="c">
+                      <i class="r"></i>
+                      <img width="36px" src="{{ url_for('static', filename='assets/warning.png') }}" alt="Warning Icon">
+                      <strong>Warning</strong>
+                      <span data-o="opened" data-c="closed"></span>
+                    </label>
+                </div>  
+                <div class="dobui">
+                    <div class="weather f">
+                        <div>
+                            <strong><span id="AQI">{{ sensor_data.AQI }}</span></strong>
+                            <p>Độ Bụi</p>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            
+        </header>
+
+        <section>
+            <div class="charts">
+                <canvas id="myAQIChart" style="width:100%;max-width:400px"></canvas>
+            </div>                    
+        </section>
+    </div>
+
+    <script>
+        let startingValue = 0; // Giá trị bắt đầu cho trục x
+        let myAQIChart;
+        const maxLabels = 10; // Số nhãn trên trục x
+
+        function updateChart() {
+            fetch('/get_datadb1')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || !Array.isArray(data) || data.length === 0) return;
+
+                    // Lấy dữ liệu AQI từ data
+                    const AQIs = data.map(item => item.AQI).reverse();
+                    const hourLabels = Array.from({ length: maxLabels }, (_, i) => (startingValue + i) % 24);
+
+                    if (myAQIChart) {
+                        myAQIChart.data.labels = hourLabels;
+                        myAQIChart.data.datasets[0].data = AQIs.slice(-maxLabels);
+                        myAQIChart.update();
+                    } else {
+                        const ctxAQI = document.getElementById('myAQIChart').getContext('2d');
+                        myAQIChart = new Chart(ctxAQI, {
+                            type: 'line',
+                            data: {
+                                labels: hourLabels,
+                                datasets: [{
+                                    label: 'Độ Bụi',
+                                    data: AQIs.slice(-maxLabels),
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    fill: false
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    startingValue = (startingValue + 1) % 24;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Khởi tạo biểu đồ lần đầu và cập nhật mỗi 10 giây
+        updateChart();
+        setInterval(updateChart, 10000);
+    </script>
+</body>
+</html>
+
+    
