@@ -151,7 +151,7 @@ void loop() {
     // Doc gia tri tu cac chan     analog va digital
     int analogValue = analogRead(ANALOG_INPUT_PIN); // Doc gia tri tu chan A0 (cam bien anh sang)
     int digitalValue = digitalRead(DIGITAL_INPUT_PIN); // Doc gia tri tu GPIO5 (chan digital)
-    int aqivalue = random (25,100);
+    int aqivalue = random (0,100);
 
     // Kiem tra loi doc cam bien DHT
     if (isnan(temp) || isnan(humi)) {
@@ -164,8 +164,9 @@ void loop() {
     Serial.print("Publish message: ");
     Serial.println(msg);
     client.publish("data", msg);
-    if (temp > 35) {
-            for (int i=0;i<10;i++) {  
+ 
+    if (aqivalue > 70) {
+            for (int i=0;i<4;i++) {  // Nháy liên tục khi nhiệt độ vẫn > 35
             digitalWrite(LEDW, HIGH);
             delay(250);  
             digitalWrite(LEDW, LOW);
@@ -174,6 +175,7 @@ void loop() {
           } else {
             digitalWrite(LEDW, LOW); // LED tắt khi nhiệt độ <= 35
             }
+    
     delay(50);
   }
 }
