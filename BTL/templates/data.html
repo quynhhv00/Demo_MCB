@@ -15,6 +15,7 @@
                     <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
                     <li><a href="{{ url_for('index_info') }}">History</a></li>
                     <li><a class="active">Data</a></li>
+                    <li><a href="{{ url_for('indexdb') }}">Bụi</a></li>
                 </ul>
             </div>
 
@@ -22,6 +23,7 @@
                 <select id="search-option">
                     <option value="temperature">Temperature</option>
                     <option value="humidity">Humidity</option>
+                    <option value="AQI">Độ Bụi</option>
                     <option value="light">Light</option>
                     <option value="timestamp">Time_stamp</option>
                 </select>
@@ -36,6 +38,7 @@
                             <th>ID</th>
                             <th>Temp</th>
                             <th>Humi</th>
+                            <th>Độ Bụi</th>
                             <th>Light</th>
                             <th>Time_stamp</th>
                         </tr>
@@ -80,6 +83,7 @@
                 <td>${item[2]}</td>
                 <td>${item[3]}</td>
                 <td>${item[4]}</td>
+                <td>${item[5]}</td>
             </tr>`;
             tableBody.innerHTML += row;
         });
