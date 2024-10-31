@@ -59,6 +59,8 @@ def get_data():
     
     return jsonify(data)
 
+
+
 # Lấy thông số cảm biến và timestamp từ database
 @app.route('/control')
 def index():
@@ -72,6 +74,39 @@ def index():
     return render_template('mainpro.html', sensor_data=sensor_data)
 
 
+@app.route('/get_datadb')
+def get_datadb():
+    conn = get_db_connection()  # Thêm kết nối ở đây
+    cursor = conn.cursor()
+    cursor.execute("SELECT AQI FROM datass ORDER BY Tgian DESC LIMIT 1")
+    row = cursor.fetchone()   
+    cursor.close()
+    conn.close()
+    
+    data = {
+        'AQI': row[0],
+    }
+    
+    return jsonify(data)
+@app.route('/dobui')
+def indexdb():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT  AQI FROM datass ORDER BY Tgian DESC LIMIT 1")
+    sensor_data = cursor.fetchone()   
+    # Đóng kết nối
+    cursor.close()
+    conn.close()
+    return render_template('dobui.html', sensor_data=sensor_data)
+@app.route('/get_datadb1')
+def get_datadb1():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT AQI FROM datass ORDER BY Tgian DESC LIMIT 10")
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(rows)
 #Lấy dữ liệu vào biểu đồ
 @app.route('/get_data1')
 def get_data1():
@@ -82,6 +117,7 @@ def get_data1():
     cursor.close()
     conn.close()
     return jsonify(rows)
+
 
 
 @app.route('/chart')
@@ -182,7 +218,7 @@ def get_data2():
     if search_query:
         if search_option == 'timestamp':
             sql_query = """
-                SELECT id, temperature, humidity, light, times 
+                SELECT id, temperature, humidity, AQI, light, times 
                 FROM datass 
                 WHERE Tgian LIKE %s
                 ORDER BY Tgian DESC 
@@ -190,7 +226,7 @@ def get_data2():
             """
         else:
             sql_query = f"""
-                SELECT id, temperature, humidity, light, times 
+                SELECT id, temperature, humidity, AQI, light, times 
                 FROM datass 
                 WHERE {search_option} LIKE %s
                 ORDER BY Tgian DESC 
@@ -200,7 +236,7 @@ def get_data2():
         cursor.execute(sql_query, (search_term, limit, offset))
     else:
         cursor.execute("""
-            SELECT id, temperature, humidity,  light, times
+            SELECT id, temperature, humidity, AQI,  light, times
             FROM datass 
             ORDER BY Tgian DESC 
             LIMIT %s OFFSET %s
