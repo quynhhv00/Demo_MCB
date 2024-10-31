@@ -34,15 +34,15 @@
                 document.querySelector('#light').innerHTML = data.light + ' Lux';
                 document.querySelector('#date').innerHTML = data.date;
 
-                if (data.temperature > 35&& !document.getElementById("c").checked) {
-                document.getElementById("c").checked = true;
-                controlDevice('ledw', true);  // Gọi hàm bật warning LED
-                saveCheckboxState('c');  // Lưu trạng thái checkbox sau khi bật LED
-            } else  if (data.temperature < 35 && document.getElementById("c").checked){
-                document.getElementById("c").checked = false;
-                controlDevice('ledw', false);  // Gọi hàm tắt warning LED
-                saveCheckboxState('c');  // Lưu trạng thái checkbox sau khi tắt LED
-            }
+            //     if (data.temperature > 35&& !document.getElementById("c").checked) {
+            //     document.getElementById("c").checked = true;
+            //     controlDevice('ledw', true);  // Gọi hàm bật warning LED
+            //     saveCheckboxState('c');  // Lưu trạng thái checkbox sau khi bật LED
+            // } else if (data.temperature < 35 && document.getElementById("c").checked){
+            //     document.getElementById("c").checked = false;
+            //     controlDevice('ledw', false);  // Gọi hàm tắt warning LED
+            //     saveCheckboxState('c');  // Lưu trạng thái checkbox sau khi tắt LED
+            // }
                 
             });
     }
@@ -55,7 +55,6 @@
         window.onload = function() {
             loadCheckboxState("a");
             loadCheckboxState("b");
-            loadCheckboxState("c");
         }
 
         function controlDevice(device, state) {
@@ -87,6 +86,7 @@
                   <li><a href="{{ url_for('index_chart') }}">Chart</a></li>
                   <li><a href="{{ url_for('index_info') }}">History</a></li>
                   <li><a href="{{ url_for('index_data') }}">Data</a></li>
+                  <li><a href="{{ url_for('indexdb') }}">Bụi</a></li>
                 </ul>
             </div>
             <div class="f fe">
@@ -135,17 +135,6 @@
                     
                   </label>
                 </div>
-                
-                <div class="appliance">
-                    <input type="checkbox" name="a" id="c" onchange="controlDevice('ledw', this.checked); saveCheckboxState('c');">
-                    <label for="c">
-                      <i class="r"></i>
-                      <img width="36px" src="{{ url_for('static', filename='assets/warning.png') }}" alt="Example Image">
-                      <strong>Warning</strong>
-                      <span data-o="opened" data-c="closed"></span>
-                      
-                    </label>
-                  </div>
 
 
             </div>
