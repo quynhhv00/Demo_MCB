@@ -166,14 +166,14 @@ void loop() {
     client.publish("data", msg);
  
     if (aqivalue > 70) {
-            for (int i=0;i<4;i++) {  // Nháy liên tục khi nhiệt độ vẫn > 35
+            for (int i=0;i<4;i++) {  
             digitalWrite(LEDW, HIGH);
             delay(250);  
             digitalWrite(LEDW, LOW);
             delay(250); 
         }
           } else {
-            digitalWrite(LEDW, LOW); // LED tắt khi nhiệt độ <= 35
+            digitalWrite(LEDW, LOW); 
             }
     
     delay(50);
